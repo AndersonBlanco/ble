@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Bluetooth Availability</title>
+</head>
+<body>
+
+    <h1>Web Bluetooth Status</h1>
+
+    <p id="statusMessage">Checking Bluetooth availability...</p>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Check if navigator.bluetooth exists
+            if ('bluetooth' in navigator) {
+                try {
+                    const available = await navigator.bluetooth.getAvailability();
+                    statusMessage.textContent = `Bluetooth is ${available ? 'available' : 'unavailable'}`;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'bluetoothAvailability',
+                        available: available,
+                    }));
+                } catch (error) {
+                    statusMessage.textContent = `Error checking Bluetooth availability: ${error.message}`;
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                        type: 'bluetoothAvailability',
+                        error: error.message,
+                    }));
+                }
+            } else {
+                statusMessage.textContent = 'Web Bluetooth is not supported in this environment.';
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'bluetoothAvailability',
+                    available: false, // Indicate unavailability
+                    message: 'Web Bluetooth is not supported in this environment.',
+                }));
+            }
+        });
+    </script>
+
+</body>
+</html>
